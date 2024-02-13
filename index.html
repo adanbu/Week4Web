@@ -2,71 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Tailwind</title>
-    <link rel="stylesheet" href="/style.css" />
+    <title>BTC/USD Prices</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
+  <body>
+    <div id="app" class="max-w-[1000px] mx-auto">
+      <h1 class="font-bold text-3xl text-center text-blue-600 my-4">
+        Cryptocurrency Data
+      </h1>
+    </div>
+    <script>
+      const fields = ["image", "symbol", "name", "summary"]
+      const row = (k, v, i) => {
+        // complete tr string
+        //return `<tr>${Object.entries(v).filter(([k,v])=>fields.includes(k)).map(([k, v], i) => cell(k,v)).join('')}</tr>`
+        return `<tr>${fields.map((f) => cell(k, f, v)).join("")}</tr>`
+      }
 
-  <body
-    class="h-screen bg-gradient-to-b from-gray-900 to-slate-800 flex flex-col text-white"
-  >
-    <header class="py-16">
-      <h1 class="text-4xl font-bold text-center mb-6">Create Tailwind</h1>
-      <div class="flex flex-row justify-center items-center gap-4">
-        <a
-          class="github-button"
-          href="https://github.com/andrejjurkin/create-tw"
-          data-color-scheme="no-preference: dark; light: dark; dark: dark;"
-          data-icon="octicon-star"
-          data-size="large"
-          data-show-count="true"
-          aria-label="Star andrejjurkin/create-tw on GitHub"
-          >Star</a
-        >
-        <a
-          class="github-button"
-          href="https://github.com/andrejjurkin/create-tw/discussions"
-          data-color-scheme="no-preference: dark; light: dark; dark: dark;"
-          data-icon="octicon-comment-discussion"
-          data-size="large"
-          aria-label="Discuss andrejjurkin/create-tw on GitHub"
-          >Discuss</a
-        >
-      </div>
-    </header>
+      const cell = (sym, prop, v) => {
+        switch (prop) {
+          case "image":
+            return `<td class="w-16 p-2 align-top border-b border-gray-200"><img class="h-full w-auto" src="${v[prop]}" /></td>`
+          case "symbol":
+            return `<td class="p-2 align-top border-b border-gray-200">${sym}</td>`
+          case "name":
+            return `<td class="p-2 align-top border-b border-gray-200"><a class="text-blue-400 font-bold hover:underline" href="${v["website"]}" target="_blank">${v[prop]}</a></td>`
+          default:
+            return `<td class="p-2 align-top border-b border-gray-200">${v[prop]}</td>`
+        }
+      }
 
-    <main class="flex-1">
-      <section class="text-center">
-        <div class="w-full grid place-items-center p-12">
-          <a href="https://vitejs.dev/">
-            <img src="/vite.svg" alt="Vite" class="h-24" />
-          </a>
-        </div>
-        <h2 class="text-3xl font-bold text-center">Created With Vite</h2>
-        <p class="mb-6">The Next Generation Frontend Tooling</p>
-        <ul
-          class="flex flex-row items-center w-full gap-8 justify-center text-blue-300 font-medium"
-        >
-          <li>
-            <a href="https://vitejs.dev/">Learn More</a>
-          </li>
-          <li>
-            <a href="https://vitejs.dev/guide/why.html">Why Vite?</a>
-          </li>
-        </ul>
-      </section>
-    </main>
+      const createTable = (data) => {
+        // create table string and insert it into "app" div before end
+        console.log(data)
+        const rows = Object.entries(data)
+          .map(([k, v], i) => row(k, v, i))
+          .join("")
 
-    <footer class="px-8 py-12 border-t border-gray-800">
-      <div class="px-8 font-medium text-center">
-        <a href="https://github.com/andrejjurkin/create-tw">
-          Create Tailwind
-        </a>
-      </div>
-    </footer>
-    <script type="module" src="/main.js"></script>
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
+        const rowHead = `<tr>${fields
+          .map(
+            (f) =>
+              `<th class="font-bold bg-gray-200">${f === "image" ? "" : f}</th>`
+          )
+          .join("")}</tr>`
+
+        const table = `<table class="w-full">${rowHead}${rows}</table>`
+        document.getElementById("app").insertAdjacentHTML("beforeend", table)
+      }
+
+      const url = "https://api.mtw-testnet.com/assets/all"
+      fetch(url)
+        .then((response) => {
+          return response.json()
+        })
+        .then((v) => createTable(v))
+        .catch((err) => console.log(err))
+    </script>
   </body>
 </html>
